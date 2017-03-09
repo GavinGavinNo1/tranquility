@@ -36,7 +36,7 @@ class DruidRollup(
   val dimensions: DruidDimensions,
   val aggregators: IndexedSeq[AggregatorFactory],
   val indexGranularity: QueryGranularity,
-  val isRollup: Boolean
+  val isRollup: Boolean = true
 )
 {
   private val additionalExclusions: Set[String] = {

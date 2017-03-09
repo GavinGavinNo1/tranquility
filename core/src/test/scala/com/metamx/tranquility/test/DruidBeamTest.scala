@@ -24,8 +24,7 @@ import com.fasterxml.jackson.databind.{ObjectReader, DeserializationContext, Inj
 import com.google.inject.Key
 import com.metamx.common.Granularity
 import com.metamx.common.scala.untyped.Dict
-import com.metamx.emitter.core.Emitter
-import com.metamx.emitter.core.Event
+import com.metamx.emitter.core.NoopEmitter
 import com.metamx.emitter.service.ServiceEmitter
 import com.metamx.tranquility.beam.ClusteredBeamTuning
 import com.metamx.tranquility.druid.DruidBeamConfig
@@ -55,27 +54,18 @@ import _root_.scala.collection.JavaConverters._
 class DruidBeamTest extends FunSuite with Matchers
 {
   private def emptyEmitter(): ServiceEmitter = new ServiceEmitter(
-    "service", "host", new Emitter
-    {
-      override def flush(): Unit = ???
-
-      override def emit(event: Event): Unit = ???
-
-      override def close(): Unit = ???
-
-      override def start(): Unit = ???
-    }
+    "service", "host", new NoopEmitter()
   )
 
   private def defaultObjectReader(): ObjectReader = DruidGuicer.Default.objectMapper.reader(
     new InjectableValues
     {
       override def findInjectableValue(
-                                        valueId: Any,
-                                        ctxt: DeserializationContext,
-                                        forProperty: databind.BeanProperty,
-                                        beanInstance: scala.Any
-                                      ): AnyRef =
+          valueId: Any,
+          ctxt: DeserializationContext,
+          forProperty: databind.BeanProperty,
+          beanInstance: scala.Any
+        ): AnyRef =
       {
         valueId match {
           case k: Key[_] if k.getTypeLiteral.getRawType == classOf[ChatHandlerProvider] => new NoopChatHandlerProvider
